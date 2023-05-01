@@ -2,10 +2,14 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 
 import Button from '../components/Button';
+import Display from '../components/Display';
 
 function Calculator(): JSX.Element {
+    const [displayValue, setDisplayValue] = React.useState<string>('0');
+
     return (
         <SafeAreaView style={styles.container}>
+            <Display value={displayValue} />
             <View style={styles.buttons}>
                 <Button label="AC" />
                 <Button label="/" />
@@ -34,9 +38,6 @@ export default Calculator;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
     },
     buttons: {
         flexDirection: 'row',
