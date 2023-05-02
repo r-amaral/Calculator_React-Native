@@ -35,7 +35,7 @@ const styles = StyleSheet.create<any>({
         borderColor: '#888',
     },
     operation: {
-        color: 'fff',
+        color: '#fff',
         backgroundColor: '#fa8231',
     },
     double: {

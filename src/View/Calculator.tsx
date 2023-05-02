@@ -4,16 +4,81 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import Button from '../components/Button';
 import Display from '../components/Display';
 
-function Calculator(): JSX.Element {
-    const [displayValue, setDisplayValue] = useState<string>('0');
+interface CalcTypes {
+    clearDisplay: boolean;
+    operation: string | null;
+    values: number[];
+    current: number;
+}
 
-    const addDigit = (digit: string) => {
-        setDisplayValue(digit);
+function Calculator(): JSX.Element {
+    const initialState = {
+        clearDisplay: false,
+        operation: null,
+        values: [0, 0],
+        current: 0,
     };
 
-    const clearMemory = () => setDisplayValue('0');
+    const [displayValue, setDisplayValue] = useState<string>('0');
+    const [calcProps, setCalcProps] = useState<CalcTypes>(initialState);
 
-    const addOperation = (operation: string) => {};
+    const addDigit = (digit: string) => {
+        const clearDisplay = displayValue === '0' || calcProps.clearDisplay;
+
+        if (digit === '.' && !clearDisplay && displayValue.includes('.')) {
+            return;
+        }
+
+        const currentValue = clearDisplay ? '' : displayValue;
+        const newDisplayValue = currentValue + digit;
+
+        setDisplayValue(newDisplayValue);
+        setCalcProps({ ...calcProps, clearDisplay: false });
+
+        if (digit !== '.') {
+            const newValue = parseFloat(newDisplayValue);
+            const values = [...calcProps.values];
+            values[calcProps.current] = newValue;
+            setCalcProps({ ...calcProps, values: values, clearDisplay: false });
+        }
+    };
+
+    const clearMemory = () => {
+        setDisplayValue('0');
+        setCalcProps({ ...initialState });
+    };
+
+    const addOperation = (operation: string) => {
+        if (calcProps.current === 0) {
+            setCalcProps({
+                ...calcProps,
+                operation,
+                current: 1,
+                clearDisplay: true,
+            });
+        } else {
+            const equals = operation === '=';
+            const values = [...calcProps.values];
+
+            try {
+                values[0] = eval(
+                    `${values[0]} ${calcProps.operation} ${values[1]}`,
+                );
+            } catch (error) {
+                values[0] - calcProps.values[0];
+            }
+
+            values[1] = 0;
+            setDisplayValue(values[0].toString());
+            setCalcProps({
+                ...calcProps,
+                operation: equals ? null : operation,
+                current: equals ? 0 : 1,
+                clearDisplay: !equals,
+                values,
+            });
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
